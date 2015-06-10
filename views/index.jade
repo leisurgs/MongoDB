@@ -2,4 +2,10 @@ extends layout
 
 block content
   h1= title
+  link(rel='stylesheet', href='/stylesheets/style.css')
   p Welcome to #{title}
+  div
+   form
+   h2 Enter URL: 
+     input(type='text' name='EnterURL')
+     input(class='submitButton' type='submit' value='EnterURL')
