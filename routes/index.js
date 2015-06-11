@@ -2,37 +2,31 @@ var express = require('express');
 var router = express.Router();
 var MongoClient = require('mongodb').MongoClient;
 var uuid = require('uuid');
-var myString = uuid.v4();
+
 
 MongoClient.connect('mongodb://127.0.0.1:27017/test', function(err, db) {
   if (err) {
     throw err;
   }
-});
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
-
-router.get('/', function(request, response) {
-  var url = request.body.EnterURL;
-  var alterUrl = myString.set(url);
-  db.inventory.insert{
-  	url: url,
-  	alterUrl: alterUrl
-  }
-  response.render('index', {
-  	title: "Here is your shortened url.",
-  	user: null,
-  	alterUrl: alterUrl
-  });
   // index.jade needs a form to submit a URL for shortening
-});
+
 
 router.post('/', function(request, response) {
+  var myString = uuid.v4();
   var collection = db.collection('urls');
-  collection.insert({/*info you generate*/}, function(err, docs) {
+  var shortUrl = 'bbb'
+  collection.insert({
+  	_id: myString,
+  	shortened: shortUrl,
+  	target: request.body.EnterURL
+  	// clicks: 0
+  }, function(err, docs) {
     response.redirect('/info/' + shortUrl);
   });
 });
@@ -41,24 +35,31 @@ router.get('/info/:shortUrl', function(request, response) {
   var collection = db.collection('urls'),
       shortUrl = request.params.shortUrl;
   collection.find({'shortened': shortUrl}, function(err, url) {
-    response.render('info', {url: url});
+    response.render('info', {url: url, shortUrl: shortUrl});
   });
 });
 
 router.get('/:shortUrl', function(request, response) {
-  var collection = db.collection('urls'),
-      shortUrl = request.params.shortUrl;
-  collection.find({'shortened': shortUrl}, function(err, url) {
-    response.redirect(url.target);
-  });
+  	var collection = db.collection('urls'),
+    	shortUrl = request.url;
+
+  	console.log('this is shorty', shortUrl);
+  	collection.find().toArray(function(err, results) {
+    	console.dir(results);
+      	db.close();
+      	var target = results.reduce(function(retUrl, curr) {
+      		if (curr.shortened === shortUrl) {
+      		return curr.target;
+      		}
+    	});
+      response.redirect(target);
+    });
+  // collection.find({'shortened': shortUrl}, function(err, url) {
+  //   console.log("booyah", url.shortUrl);
+  //   
+  // });
+});
 });
 
 module.exports = router;
 
-router.get('/', function(request, response) {
-  var url = request.body.EnterURL;
-  var alteredURL = client.set(url);
-  MongoClient.insert
-  response.render('index', {});
-  // index.jade needs a form to submit a URL for shortening
-});
