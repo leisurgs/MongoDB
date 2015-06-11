@@ -4,7 +4,7 @@ var MongoClient = require('mongodb').MongoClient;
 var uuid = require('uuid');
 
 
-MongoClient.connect('mongodb://127.0.0.1:27017/test', function(err, db) {
+MongoClient.connect('mongodb://127.0.0.1:27017/MongoDB', function(err, db) {
   if (err) {
     throw err;
   }
@@ -41,7 +41,7 @@ router.get('/info/:shortUrl', function(request, response) {
 
 router.get('/:shortUrl', function(request, response) {
   	var collection = db.collection('urls'),
-    	shortUrl = request.url;
+    	shortUrl = request.params.shortUrl;
 
   	console.log('this is shorty', shortUrl);
   	collection.find().toArray(function(err, results) {
@@ -52,7 +52,7 @@ router.get('/:shortUrl', function(request, response) {
       		return curr.target;
       		}
     	});
-      response.redirect(target);
+      response.redirect('http://' + target);
     });
   // collection.find({'shortened': shortUrl}, function(err, url) {
   //   console.log("booyah", url.shortUrl);
